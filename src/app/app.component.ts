@@ -13,6 +13,8 @@ import { NgForm } from '@angular/forms';
 export class AppComponent implements OnInit{
 
   public employees: Employee[] = [];
+  public updatedEmployee: Employee | undefined;
+  public deletedEmployee: Employee | undefined;
 
   constructor(private employeeService: EmployeeService){}
 
@@ -37,12 +39,42 @@ export class AppComponent implements OnInit{
       (response: Employee) =>{
         console.log(response);
         this.getEmployees();
+        addForm.reset();
+      },
+      (error: HttpErrorResponse) =>{
+        alert(error.message)
+        addForm.reset();
+      }
+    );
+
+  }
+
+  public onUpdateEmployee(employee: Employee): void{
+    this.employeeService.updateEmployee(employee).subscribe(
+      (response: Employee) =>{
+        console.log(response);
+        this.getEmployees();
       },
       (error: HttpErrorResponse) =>{
         alert(error.message)
       }
     );
 
+  }
+
+   public onDeleteEmployee(): void{
+    if(this.deletedEmployee)
+    {
+      this.employeeService.deleteEmployee(this.deletedEmployee?.id).subscribe(
+        (response: void) =>{
+          console.log(response);
+          this.getEmployees();
+        },
+        (error: HttpErrorResponse) =>{
+          alert(error.message)
+        }
+      );
+    }
   }
 
   public onOpenModal(employee: Employee | null, mode: string): void{
@@ -55,9 +87,15 @@ export class AppComponent implements OnInit{
       button.setAttribute('data-target', '#addEmployeeModal')
     }
     if(mode === 'update'){
+      if (employee) {
+        this.updatedEmployee = employee;
+      }
       button.setAttribute('data-target', '#updateEmployeeModal')
     }
     if(mode === 'delete'){
+      if(employee){
+        this.deletedEmployee = employee;
+      }
       button.setAttribute('data-target', '#deleteEmployeeModal')
     }
     container?.appendChild(button);
