@@ -9,7 +9,24 @@ import { HttpErrorResponse } from '@angular/common/http';
   standalone: false,
   styleUrl: './app.component.css'
 })
-export class AppComponent implements {
+export class AppComponent implements OnInit{
 
-  
+  public employees: Employee[] = [];
+
+  constructor(private employeeService: EmployeeService){}
+
+  ngOnInit(): void{
+      this.getEmployees();
+  }
+
+  public getEmployees(): void{
+    this.employeeService.getEmployees().subscribe(
+      (response : Employee[]) =>{
+        this.employees = response
+      },
+      (error: HttpErrorResponse) => {
+        alert(error.message)
+      }
+    )
+  }
 }
